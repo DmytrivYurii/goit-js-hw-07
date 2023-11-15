@@ -28,7 +28,7 @@ function renderGallery() {
 
     const image = document.createElement("img");
     image.classList.add("gallery__image");
-    image.src = item.smallйImage;
+    image.src = item.smallImage;
     image.alt = item.description;
     image.dataset.source = item.largeImage;
 
