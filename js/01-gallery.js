@@ -2,53 +2,48 @@ import { galleryItems } from "./gallery-items.js";
 // Change code below this line
 
 console.log(galleryItems);
-const galleryItem = [
-  {
-    smallImage: "small-image1.jpg",
-    largeImage: "large-image1.jpg",
-    description: "Image 1 description",
-  },
-  {
-    smallImage: "small-image2.jpg",
-    largeImage: "large-image2.jpg",
-    description: "Image 2 description",
-  },
-];
 
-function renderGallery() {
-  const galleryContainer = document.querySelector(".gallery");
+const imageContainer = document.querySelector(".gallery");
+let imageModule;
 
-  galleryItems.forEach((item) => {
-    const galleryItem = document.createElement("li");
-    galleryItem.classList.add("gallery__item");
+const markup = galleryItems
+  .map(
+    ({ preview, original, description }) =>
+      ` <li class="gallery__item">
+        <a class="gallery__link" href="${original}">
+          <img
+          class="gallery__image"
+          src="${preview}"
+          data-source="${original}"
+          alt="${description}"
+          />
+        </a>
+      </li>`
+  )
+  .join("");
+imageContainer.insertAdjacentHTML("beforeend", markup);
 
-    const link = document.createElement("a");
-    link.classList.add("gallery__link");
-    link.href = item.largeImage;
+function onClick(evt) {
+  evt.preventDefault();
+  const targetImage = evt.target;
+  if (!targetImage.classList.contains("gallery__image")) {
+    return;
+  }
+  const currentImage = targetImage.dataset.source;
+  const currentImageDescription = targetImage.getAttribute("alt");
 
-    const image = document.createElement("img");
-    image.classList.add("gallery__image");
-    image.src = item.smallImage;
-    image.alt = item.description;
-    image.dataset.source = item.largeImage;
+  imageModule = basicLightbox.create(
+    `<img src="${currentImage}" alt="${currentImageDescription}">`
+  );
 
-    link.appendChild(image);
-    galleryItem.appendChild(link);
-    galleryContainer.appendChild(galleryItem);
-  });
+  imageModule.show();
 }
 
-document.querySelector(".gallery").addEventListener("click", (event) => {
-  event.preventDefault();
-
-  if (event.target.tagName === "IMG") {
-    const source = event.target.dataset.source;
-
-    const lightbox = basicLightbox.create(`
-        <img src = "${source}" alt = "Image description">`);
-
-    lightbox.show();
+function onEscape(evt) {
+  if (evt.code === "Escape") {
+    imageModule.close();
   }
-});
+}
 
-renderGallery();
+imageContainer.addEventListener("click", onClick);
+imageContainer.addEventListener("keydown", onEscape);
